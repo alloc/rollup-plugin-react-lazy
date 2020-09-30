@@ -1,0 +1,48 @@
+{
+  "name": "rollup-plugin-react-lazy",
+  "version": "0.1.0",
+  "description": "Seamless conditional imports with React Suspense",
+  "author": "Alec Larson",
+  "license": "MIT",
+  "repository": "alloc/rollup-plugin-react-lazy",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "src",
+    "dist",
+    "template"
+  ],
+  "scripts": {
+    "build": "rollup -c",
+    "prepare": "yarn build"
+  },
+  "peerDependencies": {
+    "rollup": "*"
+  },
+  "dependencies": {
+    "dedent": "^0.7.0",
+    "esbuild": "^0.6.34",
+    "magic-string": "^0.25.7",
+    "replace-string": "^3.1.0"
+  },
+  "devDependencies": {
+    "@types/dedent": "^0.7.0",
+    "@types/estree": "^0.0.45",
+    "@types/node": "^14.11.2",
+    "prettier": "^2.0.5",
+    "rollup": "~2.27.0",
+    "rollup-plugin-dts": "^1.4.10",
+    "rollup-plugin-esbuild": "^2.4.2",
+    "typescript": "^4.0.0"
+  },
+  "keywords": [
+    "rollup",
+    "rollup-plugin",
+    "react",
+    "lazy",
+    "conditional",
+    "import",
+    "imports",
+    "suspense"
+  ]
+}

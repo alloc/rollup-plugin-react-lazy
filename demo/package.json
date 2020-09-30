@@ -1,0 +1,21 @@
+{
+  "name": "demo",
+  "dependencies": {
+    "@pika/react": "^16.13.1",
+    "@pika/react-dom": "^16.13.1",
+    "react-responsive": "npm:@alloc/react-responsive@^8.1.0"
+  },
+  "devDependencies": {
+    "@types/react": "^16.9.49",
+    "@types/react-dom": "^16.9.8",
+    "rollup-plugin-react-lazy": "link:..",
+    "serve": "^11.3.2",
+    "typescript": "^4.0.3",
+    "vite": "^1.0.0-rc.4",
+    "vite-plugin-react": "^3.0.2"
+  },
+  "scripts": {
+    "build": "vite build",
+    "test": "serve dist"
+  }
+}
