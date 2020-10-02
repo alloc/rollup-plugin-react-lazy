@@ -110,10 +110,18 @@ export default (config: Config): Plugin => {
             )
 
             if (provider) {
+              const moduleId = path.relative(provider.root, source)
+              const isLazy = providers.every(provider =>
+                fs.existsSync(path.join(provider.root, moduleId))
+              )
+              if (!isLazy) {
+                continue // Module must exist in all providers.
+              }
+
               const lazySource = [
                 runtimeId,
                 configId,
-                path.relative(replaceAll(provider.root, path.sep, '/'), source),
+                replaceAll(moduleId, path.sep, '/'),
               ].join('/')
 
               if (!lazyModules.has(lazySource))
