@@ -20,7 +20,7 @@ export default (config: Config): Plugin => {
       root: path.resolve(root),
     })
   )
-  let compileTs: CompileFn
+
   return {
     name: 'react-lazy',
     resolveId(id) {
@@ -41,20 +41,9 @@ export default (config: Config): Plugin => {
       if (lazyModule) {
         const { source, provider } = lazyModule
 
-        const isTs = /\.tsx?$/.test(source)
-        if (isTs && !compileTs) {
-          try {
-            compileTs = loadEsbuild()
-          } catch {
-            throw Error(
-              'Must have "esbuild" installed for "rollup-plugin-react-lazy" to support TypeScript modules'
-            )
-          }
-        }
-
         let input = await readFile(source, 'utf8')
-        if (isTs) {
-          input = await compileTs(input)
+        if (/\.tsx?$/.test(source)) {
+          input = await getCompileTs()(input)
         }
 
         const moduleId = path.relative(provider.root, source)
@@ -181,14 +170,16 @@ type LazyModule = {
   provider: Provider
 }
 
-type CompileFn = (input: string) => Promise<string>
-
-function loadEsbuild(): CompileFn {
-  const { transform } = require('esbuild') as typeof import('esbuild')
-  const options: import('esbuild').TransformOptions = {
-    target: 'esnext',
-    format: 'esm',
-    loader: 'tsx',
+let compileTs: (input: string) => Promise<string>
+function getCompileTs() {
+  if (!compileTs) {
+    const { transform } = require('esbuild') as typeof import('esbuild')
+    const options: import('esbuild').TransformOptions = {
+      target: 'esnext',
+      format: 'esm',
+      loader: 'tsx',
+    }
+    compileTs = async input => (await transform(input, options)).js
   }
-  return async input => (await transform(input, options)).js
+  return compileTs
 }
