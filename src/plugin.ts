@@ -52,7 +52,11 @@ export default (config: Config): Plugin => {
         const moduleId = path.relative(provider.root, source)
         const exportIds: string[] = []
 
-        const ast: Program = this.parse(input, { ranges: true }) as any
+        const ast = catchParseErrors(
+          (): Program => this.parse(input, { ranges: true }) as any,
+          source
+        )
+
         for (const node of ast.body) {
           if (node.type == 'ExportNamedDeclaration') {
             for (const spec of node.specifiers) {
@@ -88,18 +92,22 @@ export default (config: Config): Plugin => {
       }
       return null
     },
-    async transform(code, id) {
-      if (/\.[tj]sx?$/.test(id) && id.indexOf(nodeModulesId) < 0) {
+    async transform(code, filename) {
+      if (/\.[tj]sx?$/.test(filename) && filename.indexOf(nodeModulesId) < 0) {
         let editor: MagicString | undefined
 
-        const ast: Program = this.parse(code, { ranges: true }) as any
+        const ast = catchParseErrors(
+          (): Program => this.parse(code, { ranges: true }) as any,
+          filename
+        )
+
         for (const node of ast.body) {
           if (node.type == 'ImportDeclaration') {
             let source = node.source.raw!
             source = replaceAll(source, source[0], '')
 
             if (/^\.\.?(\/|$)/.test(source)) {
-              const resolved = await this.resolve(source, id)
+              const resolved = await this.resolve(source, filename)
               if (resolved) {
                 source = resolved.id
               } else continue
@@ -193,4 +201,13 @@ function getCompileTs() {
     compileTs = async input => (await transform(input, options)).js
   }
   return compileTs
+}
+
+function catchParseErrors<T>(parseFn: () => T, filename: string): T {
+  try {
+    return parseFn()
+  } catch (e) {
+    console.log('parse failed: %O', e)
+    throw Error(`Failed to parse "${filename}"`)
+  }
 }
