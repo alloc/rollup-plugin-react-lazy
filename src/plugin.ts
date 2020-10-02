@@ -89,7 +89,7 @@ export default (config: Config): Plugin => {
       return null
     },
     async transform(code, id) {
-      if (id.indexOf(nodeModulesId) < 0) {
+      if (/\.[tj]sx?$/.test(id) && id.indexOf(nodeModulesId) < 0) {
         let editor: MagicString | undefined
 
         const ast: Program = this.parse(code, { ranges: true }) as any
