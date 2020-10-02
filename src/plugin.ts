@@ -4,6 +4,7 @@ import MagicString from 'magic-string'
 import replaceAll from 'replace-string'
 import dedent from 'dedent'
 import path from 'path'
+import uid from 'uid'
 import fs from 'fs'
 
 const { readFile } = fs.promises
@@ -13,6 +14,8 @@ const nodeModulesId = path.join(path.sep, 'node_modules', path.sep)
 
 export default (config: Config): Plugin => {
   const { redirect = id => id } = config
+
+  const configId = uid()
   const lazyModules = new Map<string, LazyModule>()
   const providers = Object.entries(config.providers).map(
     ([name, root]): Provider => ({
@@ -109,7 +112,7 @@ export default (config: Config): Plugin => {
             if (provider) {
               const lazySource = [
                 runtimeId,
-                provider.name,
+                configId,
                 path.relative(replaceAll(provider.root, path.sep, '/'), source),
               ].join('/')
 
